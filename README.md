@@ -1,3 +1,20 @@
+This project runs on Node 14.19.0
+
+```
+# copy the env example to .env
+cp .env.example .env
+
+# Copy your Google Maps API Key and update `.env`
+
+# install dependencies
+npm i
+
+# run project
+npm run dev
+
+```
+
+
 # Vue 3 + Typescript + Vite
 
 This template should help get you started developing with Vue 3 and Typescript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
