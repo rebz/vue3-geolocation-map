@@ -81,14 +81,25 @@ watch(() => mapRef.value?.ready, (isReady) => {
     // get the selected place
     const place = autocomplete.getPlace();
 
-    console.info({place})
+    // uncomment the line below to see what the data looks like
+    // console.info({place})
 
+    /**
+     * We update our userLocation, and we have a watcher above that 
+     * will react to it changing and update our map for us.
+     */
     userLocation.lat = place.geometry.location.lat()
     userLocation.lng = place.geometry.location.lng()
   });
 
 }, {})
 
+/**
+ * A script to load the Google Maps JS API ourselves, 
+ * instead of using some 3rd party package to do 
+ * it for us. Enable if you want to use it.
+ * Don't double load the script.
+ */
 // const googleMapsLoaded = ref(false);
 // (async function loadGoogleMapsApi() {
 //   try {
