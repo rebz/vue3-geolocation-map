@@ -1,8 +1,6 @@
 <script setup lang="ts">
-// imports
-import { reactive, ref } from '@vue/reactivity'
-import { watch } from 'vue';
-import { GoogleMap, Marker } from 'vue3-google-map'
+import { watch, reactive, ref } from 'vue';
+import { GoogleMap } from 'vue3-google-map'
 
 // reference to the map element
 const mapRef = ref(null);
@@ -36,9 +34,83 @@ watch([userLocation, () => mapRef.value?.ready], ([loc, isReady]) => {
   }
 }, {})
 
+
+/**
+ * Using the Places API to have an autocomplete searchbox.
+ * ---
+ * 
+ * This page is your starting point for documentation around Autocomplete.
+ * https://developers.google.com/maps/documentation/javascript/places-autocomplete
+ * 
+ * Worth noting that for the Google Maps JS API to be used in browser 
+ * you have to load it via a URL Script. This is already handled 
+ * for us in this component because the package we use for our 
+ * Google Map handles the loading of the URL. If you don't 
+ * use it on other pages you will need to load the 
+ * external script yourself.
+ * 
+ * First example of initialization Autocomplete
+ * https://developers.google.com/maps/documentation/javascript/places-autocomplete#set-options-at-construction
+ * 
+ * First mention of "getting place information" from the 
+ * autocomplete box. They say to use the `addListener` 
+ * method on the autocomplete object.
+ * https://developers.google.com/maps/documentation/javascript/places-autocomplete#get-place-information
+ * 
+ * A more concrete example
+ * https://developers.google.com/maps/documentation/javascript/places-autocomplete#get-searchbox-information
+ */
+
+// a reference to the input element so the Places API knows where to render DOM updates
+const inputRef = ref(null);
+
+// any custom options that we may want to pass along to the autocomplete instance
+const inputOptions = {}
+
+/**
+ * 
+ */
+watch(() => mapRef.value?.ready, (isReady) => {
+  if (!isReady) return
+  // initialize the autocomplete searchbox, returns an object with methods and properties
+  const autocomplete = new google.maps.places.Autocomplete(inputRef.value, inputOptions);
+
+  // listen for a selected place, and act upon it
+  autocomplete.addListener('place_changed', () => {
+    
+    // get the selected place
+    const place = autocomplete.getPlace();
+
+    console.info({place})
+
+    userLocation.lat = place.geometry.location.lat()
+    userLocation.lng = place.geometry.location.lng()
+  });
+
+}, {})
+
+// const googleMapsLoaded = ref(false);
+// (async function loadGoogleMapsApi() {
+//   try {
+//    let script = document.createElement('script')
+//    script.onload = () => {
+//     console.info('google maps loaded')
+//     googleMapsLoaded.value = true
+//    }
+//    script.async = true
+//    script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places`
+//    document.head.appendChild(script)
+//   } catch (error) {
+//     throw error
+//   }
+// })().catch((_) => {
+//   console.error('yo, something went wrong')
+// })
+
 </script>
 
 <template>
+<div>
   <GoogleMap
     ref="mapRef"
     :api-key="key"
@@ -48,4 +120,7 @@ watch([userLocation, () => mapRef.value?.ready], ([loc, isReady]) => {
     >
     <Marker :options="{ position: center }" />
   </GoogleMap>
+
+  <input ref="inputRef" type="text" v-model="inputValue" />
+</div>
 </template>
